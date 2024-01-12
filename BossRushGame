@@ -1,29 +1,47 @@
 Module BossRushGame
 
-    Sub Main()
-        Dim isRunning As Boolean = True
-        Dim bossesDefeated As Integer = 0
-        Dim bossHealth As Integer = 10
-        Dim playerHealth As Integer = 30
+    Dim bossesDefeated As Integer = 0
+    Dim playerHealth As Integer = 30
+    Dim playerMaxHealth As Integer = 30
+    Dim specialAttackCharge As Integer = 0
+    Dim inventory As New Dictionary(Of String, Integer)
 
+    Sub Main()
         Console.WriteLine("Welcome to Boss Rush Jam 2024 Game!")
-        
-        While isRunning
+
+        ' Initialize inventory with a couple of items
+        inventory("Potion") = 3
+        inventory("Bomb") = 1
+
+        While True
+            Dim bossHealth As Integer = GenerateBossHealth()
             Console.WriteLine("A wild boss appears with " & bossHealth & " health.")
             Console.WriteLine("You have " & playerHealth & " health.")
 
-            While bossHealth > 0
-                Console.WriteLine("Choose an action: (A)ttack, (H)eal, (R)un")
+            While bossHealth > 0 And playerHealth > 0
+                Console.WriteLine("Choose an action: (A)ttack, (S)pecial Attack, (I)tem, (H)eal, (R)un")
                 Dim action As ConsoleKeyInfo = Console.ReadKey()
+                Console.WriteLine() ' New line for better readability
 
                 Select Case action.Key
                     Case ConsoleKey.A
                         ' Simple attack mechanic
-                        bossHealth -= 3
+                        bossHealth -= DealDamage()
                         Console.WriteLine("You attacked the boss!")
+                    Case ConsoleKey.S
+                        ' Special attack
+                        If specialAttackCharge >= 5 Then
+                            bossHealth -= DealSpecialDamage()
+                            specialAttackCharge = 0 ' Reset charge
+                            Console.WriteLine("You used a special attack on the boss!")
+                        Else
+                            Console.WriteLine("Special attack not ready yet!")
+                        End If
+                    Case ConsoleKey.I
+                        UseItem()
                     Case ConsoleKey.H
                         ' Simple heal mechanic
-                        playerHealth += 5
+                        playerHealth = Math.Min(playerHealth + 10, playerMaxHealth)
                         Console.WriteLine("You healed yourself!")
                     Case ConsoleKey.R
                         ' Option to escape
@@ -34,12 +52,17 @@ Module BossRushGame
                         Console.WriteLine("Invalid action, try again.")
                 End Select
 
-                playerHealth -= 2
-                Console.WriteLine("The boss attacks you!")
+                ' Boss takes a turn
+                If bossHealth > 0 Then
+                    playerHealth -= BossAttack()
+                End If
 
+                ' Increase special attack charge
+                specialAttackCharge += 1
+
+                ' Check player health
                 If playerHealth <= 0 Then
                     Console.WriteLine("You were defeated by the boss...")
-                    isRunning = False
                     Exit While
                 End If
             End While
@@ -47,17 +70,71 @@ Module BossRushGame
             If bossHealth <= 0 And playerHealth > 0 Then
                 bossesDefeated += 1
                 Console.WriteLine("You defeated the boss! Total bosses defeated: " & bossesDefeated)
-                bossHealth = 10 ' Reset boss health for the next round
             End If
 
             ' Check if player wants to continue
-            Console.WriteLine("Do you want to fight the next boss? (Y/N)")
-            If Console.ReadKey().Key <> ConsoleKey.Y Then
-                isRunning = False
-            End If
+            If Not ContinueGame() Then Exit While
         End While
 
         Console.WriteLine("Game over. You defeated " & bossesDefeated & " bosses!")
     End Sub
+
+    Function GenerateBossHealth() As Integer
+        ' Randomly generate boss health between 10 and 20
+        Dim rnd As New Random()
+        Return rnd.Next(10, 21)
+    End Function
+
+    Function DealDamage() As Integer
+        ' Randomly generate player damage
+        Dim rnd As New Random()
+        Return rnd.Next(3, 8)
+    End Function
+
+    Function DealSpecialDamage() As Integer
+        ' Deal higher damage for special attacks
+        Return 15
+    End Function
+
+    Function BossAttack() As Integer
+        ' Randomly generate boss damage
+        Dim rnd As New Random()
+        Return rnd.Next(2, 5)
+    End Function
+
+    Sub UseItem()
+        Console.WriteLine("Choose an item to use: (P)otion or (B)omb")
+        Dim choice As ConsoleKeyInfo = Console.ReadKey()
+        Console.WriteLine() ' New line for better readability
+        Select Case choice.Key
+            Case ConsoleKey.P
+                If inventory("Potion") > 0 Then
+                    playerHealth = Math.Min(playerHealth + 20, playerMaxHealth)
+                    inventory("Potion") -= 1
+                    Console.WriteLine("You used a potion!")
+                Else
+                    Console.WriteLine("You don't have any potions left!")
+                End If
+            Case ConsoleKey.B
+                If inventory("Bomb") > 0 Then
+                    Console.WriteLine("You threw a bomb at the boss!")
+                    inventory("Bomb") -= 1
+                Else
+                    Console.WriteLine("You don't have any bombs left!")
+                End If
+            Case Else
+                Console.WriteLine("Invalid item, try again.")
+        End Select
+    End Sub
+
+    Function ContinueGame() As Boolean
+        Console.WriteLine("Do you want to fight the next boss? (Y/N)")
+        If Console.ReadKey().Key = ConsoleKey.Y Then
+            Console.WriteLine() ' New line for better readability
+            Return True
+        Else
+            Return False
+        End If
+    End Function
 
 End Module
