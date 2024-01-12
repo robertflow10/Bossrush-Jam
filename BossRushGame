@@ -1,0 +1,63 @@
+Module BossRushGame
+
+    Sub Main()
+        Dim isRunning As Boolean = True
+        Dim bossesDefeated As Integer = 0
+        Dim bossHealth As Integer = 10
+        Dim playerHealth As Integer = 30
+
+        Console.WriteLine("Welcome to Boss Rush Jam 2024 Game!")
+        
+        While isRunning
+            Console.WriteLine("A wild boss appears with " & bossHealth & " health.")
+            Console.WriteLine("You have " & playerHealth & " health.")
+
+            While bossHealth > 0
+                Console.WriteLine("Choose an action: (A)ttack, (H)eal, (R)un")
+                Dim action As ConsoleKeyInfo = Console.ReadKey()
+
+                Select Case action.Key
+                    Case ConsoleKey.A
+                        ' Simple attack mechanic
+                        bossHealth -= 3
+                        Console.WriteLine("You attacked the boss!")
+                    Case ConsoleKey.H
+                        ' Simple heal mechanic
+                        playerHealth += 5
+                        Console.WriteLine("You healed yourself!")
+                    Case ConsoleKey.R
+                        ' Option to escape
+                        Console.WriteLine("You ran away!")
+                        bossHealth = 0
+                        Continue While
+                    Case Else
+                        Console.WriteLine("Invalid action, try again.")
+                End Select
+
+                playerHealth -= 2
+                Console.WriteLine("The boss attacks you!")
+
+                If playerHealth <= 0 Then
+                    Console.WriteLine("You were defeated by the boss...")
+                    isRunning = False
+                    Exit While
+                End If
+            End While
+
+            If bossHealth <= 0 And playerHealth > 0 Then
+                bossesDefeated += 1
+                Console.WriteLine("You defeated the boss! Total bosses defeated: " & bossesDefeated)
+                bossHealth = 10 ' Reset boss health for the next round
+            End If
+
+            ' Check if player wants to continue
+            Console.WriteLine("Do you want to fight the next boss? (Y/N)")
+            If Console.ReadKey().Key <> ConsoleKey.Y Then
+                isRunning = False
+            End If
+        End While
+
+        Console.WriteLine("Game over. You defeated " & bossesDefeated & " bosses!")
+    End Sub
+
+End Module
