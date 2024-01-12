@@ -9,7 +9,7 @@ Module BossRushGame
     Sub Main()
         Console.WriteLine("Welcome to Boss Rush Jam 2024 Game!")
 
-        ' Initialize inventory with a couple of items
+        
         inventory("Potion") = 3
         inventory("Bomb") = 1
 
@@ -21,15 +21,15 @@ Module BossRushGame
             While bossHealth > 0 And playerHealth > 0
                 Console.WriteLine("Choose an action: (A)ttack, (S)pecial Attack, (I)tem, (H)eal, (R)un")
                 Dim action As ConsoleKeyInfo = Console.ReadKey()
-                Console.WriteLine() ' New line for better readability
+                Console.WriteLine() 
 
                 Select Case action.Key
                     Case ConsoleKey.A
-                        ' Simple attack mechanic
+                        
                         bossHealth -= DealDamage()
                         Console.WriteLine("You attacked the boss!")
                     Case ConsoleKey.S
-                        ' Special attack
+                        
                         If specialAttackCharge >= 5 Then
                             bossHealth -= DealSpecialDamage()
                             specialAttackCharge = 0 ' Reset charge
@@ -52,7 +52,7 @@ Module BossRushGame
                         Console.WriteLine("Invalid action, try again.")
                 End Select
 
-                ' Boss takes a turn
+               
                 If bossHealth > 0 Then
                     playerHealth -= BossAttack()
                 End If
@@ -72,7 +72,7 @@ Module BossRushGame
                 Console.WriteLine("You defeated the boss! Total bosses defeated: " & bossesDefeated)
             End If
 
-            ' Check if player wants to continue
+          
             If Not ContinueGame() Then Exit While
         End While
 
